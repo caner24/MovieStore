@@ -35,6 +35,8 @@ namespace MovieStore.Data.Concrete
         public IKindDal KindDal => _kindDal.Value;
         public IMovieDal MovieDal => _movieDal.Value;
 
+        public MovieStoreContext Context => _context;
+
         public async Task BeginTransactionAsync()
         {
             _transaction = await _context.Database.BeginTransactionAsync();

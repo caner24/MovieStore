@@ -4,15 +4,17 @@ using Microsoft.Extensions.DependencyInjection;
 using MovieStore.Data.Abstract;
 using MovieStore.Data.Concrete;
 using MovieStore.Entity;
+using System.Reflection;
 
 namespace MovieStore.Extensions
 {
     public static class ServiceExtensions
     {
 
-        public static void IdentityConfiguration(this IServiceCollection services)
+        public static void IdentityConfiguration(this IServiceCollection services, IConfiguration config)
         {
-            services.AddDbContext<MovieStoreContext>(options => options.UseInMemoryDatabase("MovieStore"));
+            var connectionStrings = config.GetConnectionString("SqlServer");
+            services.AddDbContext<MovieStoreContext>(options => options.UseSqlServer(connectionStrings, b => b.MigrationsAssembly("MovieStore")));
             services.AddIdentityApiEndpoints<IdentityUser>(options =>
             {
                 options.SignIn.RequireConfirmedEmail = false;

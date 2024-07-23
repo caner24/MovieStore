@@ -12,9 +12,9 @@ namespace MovieStore.Entity
     {
         public Director()
         {
-            Movie = new Movie();
+            Movies = new HashSet<Movie>();
         }
-        public Movie Movie { get; set; }
+        public HashSet<Movie> Movies { get; set; }
 
     }
 }

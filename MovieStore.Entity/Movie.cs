@@ -15,6 +15,7 @@ namespace MovieStore.Entity
             Director = new Director();
             Customers = new HashSet<Customer>();
         }
+        public int Id { get; set; }
         public string? MovieName { get; set; }
         public DateTime MovieDate { get; set; }
         public HashSet<Kind> Kinds { get; set; }

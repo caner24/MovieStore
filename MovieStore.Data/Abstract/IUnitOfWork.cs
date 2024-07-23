@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MovieStore.Data.Concrete;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace MovieStore.Data.Abstract
         Task CommitAsync();
         Task RollbackAsync();
         ICastDal CastDal { get; }
+        MovieStoreContext Context { get; }
         ICustomerDal CustomerDal { get; }
         IDirectorDal DirectorDal { get; }
         IKindDal KindDal { get; }

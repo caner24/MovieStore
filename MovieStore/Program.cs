@@ -1,5 +1,7 @@
 
 
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using MovieStore.Entity;
 using MovieStore.Extensions;
 using Serilog;
@@ -12,12 +14,14 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-
+    builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie();
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
-    builder.Services.IdentityConfiguration();
+    builder.Services.IdentityConfiguration(builder.Configuration);
     builder.Services.ServiceLifetimeOptions();
+    builder.Services.AddAutoMapper(typeof(Program));
 
     var app = builder.Build();
 
@@ -30,6 +34,8 @@ try
     else
         app.UseHsts();
 
+
+    app.MapGroup("api/identity").MapIdentityApi<IdentityUser>();
     app.UseHttpsRedirection();
     app.UseAuthentication();
     app.UseAuthorization();

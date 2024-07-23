@@ -1,0 +1,90 @@
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using MovieStore.Data.Abstract;
+using MovieStore.Entity.Dto;
+using MovieStore.Entity;
+using Microsoft.EntityFrameworkCore;
+
+namespace MovieStore.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class CastController : ControllerBase
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        public CastController(IUnitOfWork unitWork, IMapper mapper)
+        {
+            _unitOfWork = unitWork;
+            _mapper = mapper;
+        }
+
+        [HttpPost("createCast")]
+        public async Task<IActionResult> CreateCast([FromBody] CreateCastDto createCastDto)
+        {
+            var cast = _mapper.Map<Cast>(createCastDto);
+            var addedDirector = await _unitOfWork.CastDal.AddCast(cast);
+            if (!addedDirector.Succeeded)
+            {
+                foreach (var item in addedDirector.Errors)
+                {
+                    ModelState.AddModelError(item.Code, item.Description);
+                }
+                return Ok(ModelState);
+            }
+            return StatusCode(201, cast.Id);
+        }
+
+
+        [HttpGet("getCastByEmail/{email}")]
+        public async Task<IActionResult> GetCastyByEmail([FromRoute] string email)
+        {
+            var cast = await _unitOfWork.CastDal.GetCastByEmail(email);
+            if (cast is null)
+                return NotFound();
+
+            return Ok(cast);
+        }
+
+        [HttpGet("getAllCast")]
+        public async Task<IActionResult> GetAllCast()
+        {
+            var cast = await _unitOfWork.CastDal.GetAll().ToListAsync();
+            if (cast is null)
+                return NotFound();
+
+            return Ok(cast);
+        }
+
+        [HttpDelete("deleteCast/{Id}")]
+        public async Task<IActionResult> DeleteCast([FromRoute] DeleteCastDto deleteCastDto)
+        {
+            var cast = await _unitOfWork.CastDal.Get(x => x.Id == deleteCastDto.Id).FirstOrDefaultAsync();
+            if (cast is null)
+                return NotFound();
+            await _unitOfWork.CastDal.DeleteAsync(cast);
+
+            return Ok();
+        }
+
+        [HttpPut("addCastMovieByEmail/{email}")]
+        public async Task<IActionResult> AddMovieByCastEmail([FromRoute] string email, [FromBody] int[] movieId)
+        {
+            var cast = await _unitOfWork.CastDal.GetCastByEmail(email);
+            if (cast is null)
+                return NotFound();
+
+            foreach (var item in movieId)
+            {
+                var movie = await _unitOfWork.MovieDal.Get(x => x.Id == item).FirstOrDefaultAsync();
+                if (movie is null)
+                    return NotFound();
+
+                cast.Movies.Add(movie);
+            }
+            await _unitOfWork.CastDal.UpdateAsync(cast);
+
+            return Ok();
+        }
+    }
+}
