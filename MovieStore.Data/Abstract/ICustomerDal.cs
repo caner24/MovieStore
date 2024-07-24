@@ -12,8 +12,7 @@ namespace MovieStore.Data.Abstract
 {
     public interface ICustomerDal : IEntityRepositoryBase<Customer>
     {
-        Task<IdentityResult> AddCustomer(Customer customer);
-        Task<Customer> GetCustomerByEmail(string email);
+        Task<IdentityResult> AddCustomer(BaseUser customer,string password);
         Task<SignInResult> SignIn(string email, string password);
 
     }

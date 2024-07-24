@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MovieStore.Core.Data;
 using MovieStore.Core.Data.EfCore.Concrete;
 using MovieStore.Data.Abstract;
@@ -14,27 +15,20 @@ namespace MovieStore.Data.Concrete
 {
     public class CustomerDal : EfRepositoryBase<MovieStoreContext, Customer>, ICustomerDal
     {
-        private readonly UserManager<Customer> _userManager;
-        private readonly SignInManager<Customer> _signInManager;
-        public CustomerDal(MovieStoreContext tContext, UserManager<Customer> userManager, SignInManager<Customer> signInManager) : base(tContext)
+        private readonly UserManager<BaseUser> _userManager;
+        private readonly SignInManager<BaseUser> _signInManager;
+        public CustomerDal(MovieStoreContext tContext, UserManager<BaseUser> userManager, SignInManager<BaseUser> signInManager) : base(tContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
         }
 
-        public async Task<IdentityResult> AddCustomer(Customer customer)
+        public async Task<IdentityResult> AddCustomer(BaseUser customer,string password)
         {
-            var userManager = await _userManager.CreateAsync(customer);
+            var userManager = await _userManager.CreateAsync(customer, password);
             await _userManager.AddToRoleAsync(customer, "Customer");
             return userManager;
         }
-
-        public async Task<Customer> GetCustomerByEmail(string email)
-        {
-            var customer = await _userManager.FindByEmailAsync(email);
-            return customer;
-        }
-
         public async Task<SignInResult> SignIn(string email, string password)
         {
             var customer = await _userManager.FindByEmailAsync(email);

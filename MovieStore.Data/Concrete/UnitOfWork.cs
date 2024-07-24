@@ -13,13 +13,13 @@ namespace MovieStore.Data.Concrete
     {
         private readonly MovieStoreContext _context;
         private IDbContextTransaction? _transaction;
-        private readonly Lazy<ICastDal> _castDal;
-        private readonly Lazy<ICustomerDal> _customerDal;
-        private readonly Lazy<IDirectorDal> _directorDal;
-        private readonly Lazy<IKindDal> _kindDal;
-        private readonly Lazy<IMovieDal> _movieDal;
+        private readonly ICastDal _castDal;
+        private readonly ICustomerDal _customerDal;
+        private readonly IDirectorDal _directorDal;
+        private readonly IKindDal _kindDal;
+        private readonly IMovieDal _movieDal;
 
-        public UnitOfWork(MovieStoreContext context, Lazy<ICastDal> castDal, Lazy<ICustomerDal> customerDal, Lazy<IDirectorDal> directorDal, Lazy<IKindDal> kindDal, Lazy<IMovieDal> movieDal)
+        public UnitOfWork(MovieStoreContext context, ICastDal castDal, ICustomerDal customerDal, IDirectorDal directorDal, IKindDal kindDal, IMovieDal movieDal)
         {
             _context = context;
             _castDal = castDal;
@@ -29,12 +29,11 @@ namespace MovieStore.Data.Concrete
             _movieDal = movieDal;
         }
 
-        public ICastDal CastDal => _castDal.Value;
-        public ICustomerDal CustomerDal => _customerDal.Value;
-        public IDirectorDal DirectorDal => _directorDal.Value;
-        public IKindDal KindDal => _kindDal.Value;
-        public IMovieDal MovieDal => _movieDal.Value;
-
+        public ICastDal CastDal => _castDal;
+        public ICustomerDal CustomerDal => _customerDal;
+        public IDirectorDal DirectorDal => _directorDal;
+        public IKindDal KindDal => _kindDal;
+        public IMovieDal MovieDal => _movieDal;
         public MovieStoreContext Context => _context;
 
         public async Task BeginTransactionAsync()

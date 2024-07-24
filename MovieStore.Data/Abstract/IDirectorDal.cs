@@ -13,7 +13,6 @@ namespace MovieStore.Data.Abstract
     public interface IDirectorDal : IEntityRepositoryBase<Director>
     {
 
-        Task<IdentityResult> AddDirector(Director director);
-        Task<Director> GetDirectorByEmail(string email);
+        Task<IdentityResult> AddDirector(BaseUser director, string password);
     }
 }

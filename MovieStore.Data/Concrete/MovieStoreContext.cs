@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace MovieStore.Data.Concrete
 {
-    public class MovieStoreContext : IdentityDbContext<IdentityUser>
+    public class MovieStoreContext : IdentityDbContext<BaseUser>
     {
         public MovieStoreContext(DbContextOptions<MovieStoreContext> options) : base(options)
         {
@@ -21,7 +21,6 @@ namespace MovieStore.Data.Concrete
         {
 
         }
-
 
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Cast> Cast { get; set; }
@@ -44,7 +43,7 @@ namespace MovieStore.Data.Concrete
                         .HasOne<Customer>()
                         .WithMany()
                         .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction), 
+                        .OnDelete(DeleteBehavior.NoAction),
                     j => j
                         .HasOne<Movie>()
                         .WithMany()
@@ -53,14 +52,16 @@ namespace MovieStore.Data.Concrete
                     j =>
                     {
                         j.HasKey("CustomerId", "MovieId");
-                        j.ToTable("MovieCustomers"); 
+                        j.ToTable("MovieCustomers");
                     });
+            builder.Entity<Cast>().HasKey(x => x.BaseUserId);
+            builder.Entity<Cast>().HasOne(x => x.BaseUser).WithOne(x => x.Cast).HasForeignKey<Cast>(x => x.BaseUserId);
 
-            builder.Entity<IdentityRole>().HasData(
-                new IdentityRole { Name = "Director", NormalizedName = "DIRECTOR" },
-                    new IdentityRole { Name = "Cast", NormalizedName = "CAST" },
-                        new IdentityRole { Name = "Customer", NormalizedName = "CUSTOMER" }
-                );
+            builder.Entity<Director>().HasKey(x => x.BaseUserId);
+            builder.Entity<Director>().HasOne(x => x.BaseUser).WithOne(x => x.Director).HasForeignKey<Director>(x => x.BaseUserId);
+
+            builder.Entity<Customer>().HasKey(x => x.BaseUserId);
+            builder.Entity<Customer>().HasOne(x => x.BaseUser).WithOne(x => x.Customer).HasForeignKey<Customer>(x => x.BaseUserId);
 
 
             base.OnModelCreating(builder);
@@ -69,8 +70,10 @@ namespace MovieStore.Data.Concrete
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=.;Database=MovieStore;Integrated Security=True;TrustServerCertificate=True;Encrypt=True");
+                optionsBuilder.UseInMemoryDatabase("MovieStoreDb");
+                optionsBuilder.LogTo(Console.WriteLine);
             }
+
             base.OnConfiguring(optionsBuilder);
         }
 

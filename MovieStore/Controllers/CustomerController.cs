@@ -6,6 +6,7 @@ using MovieStore.Entity;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace MovieStore.Controllers
 {
@@ -22,8 +23,8 @@ namespace MovieStore.Controllers
         [HttpPost("createCustomer")]
         public async Task<IActionResult> CreateCustomer([FromBody] CreateCustomerDto createCustomerDto)
         {
-            var customer = _mapper.Map<Customer>(createCustomerDto);
-            var addedDirector = await _unitOfWork.CustomerDal.AddCustomer(customer);
+            var customer = _mapper.Map<BaseUser>(createCustomerDto);
+            var addedDirector = await _unitOfWork.CustomerDal.AddCustomer(customer, createCustomerDto.Password);
             if (!addedDirector.Succeeded)
             {
                 foreach (var item in addedDirector.Errors)
@@ -32,6 +33,7 @@ namespace MovieStore.Controllers
                 }
                 return Ok(ModelState);
             }
+            await _unitOfWork.CustomerDal.AddAsync(new Customer { BaseUserId = customer.Id });
             return StatusCode(201, customer.Id);
         }
 
@@ -39,10 +41,9 @@ namespace MovieStore.Controllers
         [HttpGet("getCustomerByEmail/{email}")]
         public async Task<IActionResult> GetCustomeryByEmail([FromRoute] string email)
         {
-            var cast = await _unitOfWork.CustomerDal.GetCustomerByEmail(email);
+            var cast = await _unitOfWork.CustomerDal.Get(x => x.BaseUser.Email == email).FirstOrDefaultAsync();
             if (cast is null)
                 return NotFound();
-
             return Ok(cast);
         }
 
@@ -62,10 +63,10 @@ namespace MovieStore.Controllers
         }
         [Authorize(Roles = "Customer")]
         [HttpPost("buyMovieWithMovieId")]
-        public async Task<IActionResult> BuyMovieWithMovieId([FromBody] int[] movieId, ClaimsPrincipal claims)
+        public async Task<IActionResult> BuyMovieWithMovieId([FromBody] int[] movieId, [FromServices] ClaimsPrincipal claims)
         {
             var activeCustomer = claims.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault().Value;
-            var customer = await _unitOfWork.CustomerDal.GetCustomerByEmail(activeCustomer);
+            var customer = await _unitOfWork.CustomerDal.Get(x => x.BaseUser.Email == activeCustomer).FirstOrDefaultAsync();
 
             foreach (var item in movieId)
             {
@@ -80,10 +81,10 @@ namespace MovieStore.Controllers
 
         [Authorize(Roles = "Customer")]
         [HttpPost("addFavoriteKind")]
-        public async Task<IActionResult> AddFavoriteKind(ClaimsPrincipal claims, int[] kindId)
+        public async Task<IActionResult> AddFavoriteKind([FromServices] ClaimsPrincipal claims, int[] kindId)
         {
             var activeCustomer = claims.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault().Value;
-            var customer = await _unitOfWork.CustomerDal.GetCustomerByEmail(activeCustomer);
+            var customer = await _unitOfWork.CustomerDal.Get(x => x.BaseUser.Email == activeCustomer).FirstOrDefaultAsync();
 
             foreach (var item in kindId)
             {
@@ -98,12 +99,12 @@ namespace MovieStore.Controllers
 
         [Authorize(Roles = "Customer")]
         [HttpGet("getBoughtMovies")]
-        public async Task<IActionResult> GetBoughtMovies(ClaimsPrincipal claims)
+        public async Task<IActionResult> GetBoughtMovies([FromServices] ClaimsPrincipal claims)
         {
             var activeCustomer = claims.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault().Value;
 
             var boughtMovies = await _unitOfWork.Context.Movie.TemporalAll()
-                .Where(movie => movie.Customers.Any(c => c.Email == activeCustomer))
+                .Where(movie => movie.Customers.Any(c => c.BaseUser.Email == activeCustomer))
                 .ToListAsync();
 
             return Ok(boughtMovies);

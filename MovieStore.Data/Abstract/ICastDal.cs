@@ -12,7 +12,6 @@ namespace MovieStore.Data.Abstract
 {
     public interface ICastDal : IEntityRepositoryBase<Cast>
     {
-        Task<IdentityResult> AddCast(Cast cast);
-        Task<Cast> GetCastByEmail(string email);
+        Task<IdentityResult> AddCast(BaseUser cast, string password);
     }
 }

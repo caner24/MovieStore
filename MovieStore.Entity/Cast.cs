@@ -8,12 +8,15 @@ using System.Threading.Tasks;
 
 namespace MovieStore.Entity
 {
-    public class Cast : IdentityUser, IEntity
+    public class Cast : IEntity
     {
         public Cast()
         {
             Movies = new HashSet<Movie>();
         }
+
+        public string? BaseUserId { get; set; }
+        public BaseUser BaseUser { get; set; }
         public HashSet<Movie> Movies { get; set; }
 
     }

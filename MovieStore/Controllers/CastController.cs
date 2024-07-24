@@ -4,6 +4,7 @@ using MovieStore.Data.Abstract;
 using MovieStore.Entity.Dto;
 using MovieStore.Entity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace MovieStore.Controllers
 {
@@ -22,8 +23,8 @@ namespace MovieStore.Controllers
         [HttpPost("createCast")]
         public async Task<IActionResult> CreateCast([FromBody] CreateCastDto createCastDto)
         {
-            var cast = _mapper.Map<Cast>(createCastDto);
-            var addedDirector = await _unitOfWork.CastDal.AddCast(cast);
+            var cast = _mapper.Map<BaseUser>(createCastDto);
+            var addedDirector = await _unitOfWork.CastDal.AddCast(cast, createCastDto.Password);
             if (!addedDirector.Succeeded)
             {
                 foreach (var item in addedDirector.Errors)
@@ -32,6 +33,8 @@ namespace MovieStore.Controllers
                 }
                 return Ok(ModelState);
             }
+            await _unitOfWork.CastDal.AddAsync(new Cast { BaseUserId = cast.Id });
+
             return StatusCode(201, cast.Id);
         }
 
@@ -39,7 +42,7 @@ namespace MovieStore.Controllers
         [HttpGet("getCastByEmail/{email}")]
         public async Task<IActionResult> GetCastyByEmail([FromRoute] string email)
         {
-            var cast = await _unitOfWork.CastDal.GetCastByEmail(email);
+            var cast = await _unitOfWork.CastDal.Get(x =>x.BaseUser.Email==email).FirstOrDefaultAsync();
             if (cast is null)
                 return NotFound();
 
@@ -59,7 +62,7 @@ namespace MovieStore.Controllers
         [HttpDelete("deleteCast/{Id}")]
         public async Task<IActionResult> DeleteCast([FromRoute] DeleteCastDto deleteCastDto)
         {
-            var cast = await _unitOfWork.CastDal.Get(x => x.Id == deleteCastDto.Id).FirstOrDefaultAsync();
+            var cast = await _unitOfWork.CastDal.Get(x => x.BaseUser.Email == deleteCastDto.Id).FirstOrDefaultAsync();
             if (cast is null)
                 return NotFound();
             await _unitOfWork.CastDal.DeleteAsync(cast);
@@ -70,7 +73,7 @@ namespace MovieStore.Controllers
         [HttpPut("addCastMovieByEmail/{email}")]
         public async Task<IActionResult> AddMovieByCastEmail([FromRoute] string email, [FromBody] int[] movieId)
         {
-            var cast = await _unitOfWork.CastDal.GetCastByEmail(email);
+            var cast = await _unitOfWork.CastDal.Get(x => x.BaseUser.Email == email).FirstOrDefaultAsync();
             if (cast is null)
                 return NotFound();
 

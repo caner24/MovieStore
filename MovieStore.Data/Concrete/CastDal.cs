@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MovieStore.Core.Data.EfCore.Concrete;
 using MovieStore.Data.Abstract;
 using MovieStore.Entity;
@@ -13,23 +14,18 @@ namespace MovieStore.Data.Concrete
 {
     public class CastDal : EfRepositoryBase<MovieStoreContext, Cast>, ICastDal
     {
-        private readonly UserManager<Cast> _userManager;
-        public CastDal(MovieStoreContext tContext, UserManager<Cast> userManager) : base(tContext)
+        private readonly UserManager<BaseUser> _userManager;
+        public CastDal(MovieStoreContext tContext, UserManager<BaseUser> userManager) : base(tContext)
         {
             _userManager = userManager;
         }
 
-        public async Task<IdentityResult> AddCast(Cast cast)
+        public async Task<IdentityResult> AddCast(BaseUser cast, string password)
         {
-            var director = await _userManager.CreateAsync(cast);
+            var addedCast = await _userManager.CreateAsync(cast, password);
             await _userManager.AddToRoleAsync(cast, "Cast");
-            return director;
+            return addedCast;
         }
 
-        public async Task<Cast> GetCastByEmail(string email)
-        {
-            var cast = await _userManager.FindByEmailAsync(email);
-            return cast;
-        }
     }
 }

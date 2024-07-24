@@ -321,9 +321,9 @@ namespace MovieStore.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "00017153-26bb-47a0-89b2-7fc1f300dcae", null, "Cast", "CAST" },
-                    { "0a4ae885-dd22-4927-82d2-dcaef1964bfa", null, "Director", "DIRECTOR" },
-                    { "a1a755bc-1cd4-4e62-87b4-2e7374b2a396", null, "Customer", "CUSTOMER" }
+                    { "0892acc9-93c0-4cc5-9cd9-a6a8417af547", null, "Customer", "CUSTOMER" },
+                    { "29bbac1f-6218-4fa8-856b-fc1b9296fcc2", null, "Cast", "CAST" },
+                    { "38d1ce78-a1e5-4a35-90a2-cfed05b3b5d2", null, "Director", "DIRECTOR" }
                 });
 
             migrationBuilder.CreateIndex(

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MovieStore.Data.Abstract;
@@ -32,7 +33,7 @@ namespace MovieStore.Controllers
         [HttpDelete("deleteDirector/{Id}")]
         public async Task<IActionResult> DeleteCast([FromRoute] DeleteDirectorDto deleteDirectorDto)
         {
-            var director = await _unitOfWork.DirectorDal.Get(x => x.Id == deleteDirectorDto.Id).FirstOrDefaultAsync();
+            var director = await _unitOfWork.DirectorDal.Get(x => x.BaseUser.Email == deleteDirectorDto.Id).FirstOrDefaultAsync();
             if (director is null)
                 return NotFound();
             await _unitOfWork.DirectorDal.DeleteAsync(director);
@@ -43,7 +44,7 @@ namespace MovieStore.Controllers
         [HttpPut("updateDirector/{Email}")]
         public async Task<IActionResult> UpdateDirector([FromRoute] UpdateDirectorDto updateDirectorDto)
         {
-            var director = await _unitOfWork.DirectorDal.Get(x => x.Id == updateDirectorDto.Email).FirstOrDefaultAsync();
+            var director = await _unitOfWork.DirectorDal.Get(x => x.BaseUser.Email == updateDirectorDto.Email).FirstOrDefaultAsync();
             if (director is null)
                 return NotFound();
             _mapper.Map<Director>(updateDirectorDto);
@@ -55,8 +56,8 @@ namespace MovieStore.Controllers
         [HttpPost("createDirector")]
         public async Task<IActionResult> CreateDirector([FromBody] CreateDirectorDto createDirectorDto)
         {
-            var director = _mapper.Map<Director>(createDirectorDto);
-            var addedDirector = await _unitOfWork.DirectorDal.AddDirector(director);
+            var director = _mapper.Map<BaseUser>(createDirectorDto);
+            var addedDirector = await _unitOfWork.DirectorDal.AddDirector(director,createDirectorDto.Password);
             if (!addedDirector.Succeeded)
             {
                 foreach (var item in addedDirector.Errors)
@@ -65,6 +66,8 @@ namespace MovieStore.Controllers
                 }
                 return Ok(ModelState);
             }
+            await _unitOfWork.DirectorDal.AddAsync(new Director { BaseUserId = director.Id });
+
             return StatusCode(201, director.Id);
         }
 
@@ -72,7 +75,7 @@ namespace MovieStore.Controllers
         [HttpGet("getDirectorByEmail/{email}")]
         public async Task<IActionResult> GetDirectoryByEmail([FromRoute] string email)
         {
-            var director = await _unitOfWork.DirectorDal.GetDirectorByEmail(email);
+            var director = await _unitOfWork.CastDal.Get(x => x.BaseUser.Email == email).FirstOrDefaultAsync();
             if (director is null)
                 return NotFound();
 
@@ -82,7 +85,7 @@ namespace MovieStore.Controllers
         [HttpPut("addDirectorMovieByEmail/{email}")]
         public async Task<IActionResult> AddMovieByDirectorEmail([FromRoute] string email, [FromBody] int[] movieId)
         {
-            var director = await _unitOfWork.DirectorDal.GetDirectorByEmail(email);
+            var director = await _unitOfWork.DirectorDal.Get(x => x.BaseUser.Email == email).FirstOrDefaultAsync();
             if (director is null)
                 return NotFound();
 

@@ -12,7 +12,7 @@ using MovieStore.Data.Concrete;
 namespace MovieStore.Data.Migrations
 {
     [DbContext(typeof(MovieStoreContext))]
-    [Migration("20240723143737_mig_1_db_created")]
+    [Migration("20240723222432_mig_1_db_created")]
     partial class mig_1_db_created
     {
         /// <inheritdoc />
@@ -84,19 +84,19 @@ namespace MovieStore.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0a4ae885-dd22-4927-82d2-dcaef1964bfa",
+                            Id = "38d1ce78-a1e5-4a35-90a2-cfed05b3b5d2",
                             Name = "Director",
                             NormalizedName = "DIRECTOR"
                         },
                         new
                         {
-                            Id = "00017153-26bb-47a0-89b2-7fc1f300dcae",
+                            Id = "29bbac1f-6218-4fa8-856b-fc1b9296fcc2",
                             Name = "Cast",
                             NormalizedName = "CAST"
                         },
                         new
                         {
-                            Id = "a1a755bc-1cd4-4e62-87b4-2e7374b2a396",
+                            Id = "0892acc9-93c0-4cc5-9cd9-a6a8417af547",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });

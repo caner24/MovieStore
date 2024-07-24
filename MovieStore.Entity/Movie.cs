@@ -12,13 +12,13 @@ namespace MovieStore.Entity
         public Movie()
         {
             Kinds = new HashSet<Kind>();
-            Director = new Director();
             Customers = new HashSet<Customer>();
         }
         public int Id { get; set; }
         public string? MovieName { get; set; }
-        public DateTime MovieDate { get; set; }
+        public DateTime MovieDate { get; set; } = DateTime.Now;
         public HashSet<Kind> Kinds { get; set; }
+        public string DirectorId { get; set; }
         public Director Director { get; set; }
         public HashSet<Customer> Customers { get; set; }
         public double Price { get; set; }
