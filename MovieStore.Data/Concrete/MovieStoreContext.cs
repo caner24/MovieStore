@@ -21,7 +21,6 @@ namespace MovieStore.Data.Concrete
         {
 
         }
-
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Cast> Cast { get; set; }
         public DbSet<Director> Director { get; set; }
@@ -68,11 +67,6 @@ namespace MovieStore.Data.Concrete
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseInMemoryDatabase("MovieStoreDb");
-                optionsBuilder.LogTo(Console.WriteLine);
-            }
 
             base.OnConfiguring(optionsBuilder);
         }

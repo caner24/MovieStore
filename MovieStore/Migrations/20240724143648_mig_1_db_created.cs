@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
-namespace MovieStore.Data.Migrations
+namespace MovieStore.Migrations
 {
     /// <inheritdoc />
     public partial class mig_1_db_created : Migration
@@ -32,7 +30,6 @@ namespace MovieStore.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Discriminator = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -173,6 +170,81 @@ namespace MovieStore.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Cast",
+                columns: table => new
+                {
+                    BaseUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Cast", x => x.BaseUserId);
+                    table.ForeignKey(
+                        name: "FK_Cast_AspNetUsers_BaseUserId",
+                        column: x => x.BaseUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Customer",
+                columns: table => new
+                {
+                    BaseUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customer", x => x.BaseUserId);
+                    table.ForeignKey(
+                        name: "FK_Customer_AspNetUsers_BaseUserId",
+                        column: x => x.BaseUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Director",
+                columns: table => new
+                {
+                    BaseUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Director", x => x.BaseUserId);
+                    table.ForeignKey(
+                        name: "FK_Director_AspNetUsers_BaseUserId",
+                        column: x => x.BaseUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerKind",
+                columns: table => new
+                {
+                    CustomersBaseUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    FavoriteKindId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerKind", x => new { x.CustomersBaseUserId, x.FavoriteKindId });
+                    table.ForeignKey(
+                        name: "FK_CustomerKind_Customer_CustomersBaseUserId",
+                        column: x => x.CustomersBaseUserId,
+                        principalTable: "Customer",
+                        principalColumn: "BaseUserId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomerKind_Kind_FavoriteKindId",
+                        column: x => x.FavoriteKindId,
+                        principalTable: "Kind",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Movie",
                 columns: table => new
                 {
@@ -195,7 +267,7 @@ namespace MovieStore.Data.Migrations
                         .Annotation("SqlServer:TemporalHistoryTableSchema", null)
                         .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                         .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart"),
-                    DirectorId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    DirectorId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                         .Annotation("SqlServer:IsTemporal", true)
                         .Annotation("SqlServer:TemporalHistoryTableName", "MovieHistory")
                         .Annotation("SqlServer:TemporalHistoryTableSchema", null)
@@ -207,7 +279,7 @@ namespace MovieStore.Data.Migrations
                         .Annotation("SqlServer:TemporalHistoryTableSchema", null)
                         .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                         .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart"),
-                    CastId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    CastBaseUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                         .Annotation("SqlServer:IsTemporal", true)
                         .Annotation("SqlServer:TemporalHistoryTableName", "MovieHistory")
                         .Annotation("SqlServer:TemporalHistoryTableSchema", null)
@@ -230,45 +302,22 @@ namespace MovieStore.Data.Migrations
                 {
                     table.PrimaryKey("PK_Movie", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Movie_AspNetUsers_CastId",
-                        column: x => x.CastId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        name: "FK_Movie_Cast_CastBaseUserId",
+                        column: x => x.CastBaseUserId,
+                        principalTable: "Cast",
+                        principalColumn: "BaseUserId");
                     table.ForeignKey(
-                        name: "FK_Movie_AspNetUsers_DirectorId",
+                        name: "FK_Movie_Director_DirectorId",
                         column: x => x.DirectorId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalTable: "Director",
+                        principalColumn: "BaseUserId",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "MovieHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", null)
                 .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
-
-            migrationBuilder.CreateTable(
-                name: "CustomerKind",
-                columns: table => new
-                {
-                    CustomersId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FavoriteKindId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomerKind", x => new { x.CustomersId, x.FavoriteKindId });
-                    table.ForeignKey(
-                        name: "FK_CustomerKind_AspNetUsers_CustomersId",
-                        column: x => x.CustomersId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CustomerKind_Kind_FavoriteKindId",
-                        column: x => x.FavoriteKindId,
-                        principalTable: "Kind",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
 
             migrationBuilder.CreateTable(
                 name: "KindMovie",
@@ -305,25 +354,15 @@ namespace MovieStore.Data.Migrations
                 {
                     table.PrimaryKey("PK_MovieCustomers", x => new { x.CustomerId, x.MovieId });
                     table.ForeignKey(
-                        name: "FK_MovieCustomers_AspNetUsers_CustomerId",
+                        name: "FK_MovieCustomers_Customer_CustomerId",
                         column: x => x.CustomerId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalTable: "Customer",
+                        principalColumn: "BaseUserId");
                     table.ForeignKey(
                         name: "FK_MovieCustomers_Movie_MovieId",
                         column: x => x.MovieId,
                         principalTable: "Movie",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[,]
-                {
-                    { "0892acc9-93c0-4cc5-9cd9-a6a8417af547", null, "Customer", "CUSTOMER" },
-                    { "29bbac1f-6218-4fa8-856b-fc1b9296fcc2", null, "Cast", "CAST" },
-                    { "38d1ce78-a1e5-4a35-90a2-cfed05b3b5d2", null, "Director", "DIRECTOR" }
                 });
 
             migrationBuilder.CreateIndex(
@@ -376,9 +415,9 @@ namespace MovieStore.Data.Migrations
                 column: "MoviesId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Movie_CastId",
+                name: "IX_Movie_CastBaseUserId",
                 table: "Movie",
-                column: "CastId");
+                column: "CastBaseUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Movie_DirectorId",
@@ -425,12 +464,21 @@ namespace MovieStore.Data.Migrations
                 name: "Kind");
 
             migrationBuilder.DropTable(
+                name: "Customer");
+
+            migrationBuilder.DropTable(
                 name: "Movie")
                 .Annotation("SqlServer:IsTemporal", true)
                 .Annotation("SqlServer:TemporalHistoryTableName", "MovieHistory")
                 .Annotation("SqlServer:TemporalHistoryTableSchema", null)
                 .Annotation("SqlServer:TemporalPeriodEndColumnName", "PeriodEnd")
                 .Annotation("SqlServer:TemporalPeriodStartColumnName", "PeriodStart");
+
+            migrationBuilder.DropTable(
+                name: "Cast");
+
+            migrationBuilder.DropTable(
+                name: "Director");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

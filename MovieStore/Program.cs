@@ -8,6 +8,7 @@ using MovieStore.Data.Concrete;
 using MovieStore.Entity;
 using MovieStore.Extensions;
 using Serilog;
+using System.Reflection;
 using System.Security.Claims;
 
 Log.Logger = new LoggerConfiguration()
@@ -19,7 +20,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
     builder.Services.AddProblemDetails();
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
-    builder.Services.AddDbContext<MovieStoreContext>(options => options.UseInMemoryDatabase("MovieStoreDb"));
+    builder.Services.AddDbContext<MovieStoreContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServer"), sqlOptions => sqlOptions.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)));
     builder.Services.IdentityConfiguration(builder.Configuration);
     builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
         .AddCookie();

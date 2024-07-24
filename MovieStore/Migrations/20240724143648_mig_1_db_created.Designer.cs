@@ -9,10 +9,10 @@ using MovieStore.Data.Concrete;
 
 #nullable disable
 
-namespace MovieStore.Data.Migrations
+namespace MovieStore.Migrations
 {
     [DbContext(typeof(MovieStoreContext))]
-    [Migration("20240723222432_mig_1_db_created")]
+    [Migration("20240724143648_mig_1_db_created")]
     partial class mig_1_db_created
     {
         /// <inheritdoc />
@@ -27,13 +27,13 @@ namespace MovieStore.Data.Migrations
 
             modelBuilder.Entity("CustomerKind", b =>
                 {
-                    b.Property<string>("CustomersId")
+                    b.Property<string>("CustomersBaseUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("FavoriteKindId")
                         .HasColumnType("int");
 
-                    b.HasKey("CustomersId", "FavoriteKindId");
+                    b.HasKey("CustomersBaseUserId", "FavoriteKindId");
 
                     b.HasIndex("FavoriteKindId");
 
@@ -80,26 +80,6 @@ namespace MovieStore.Data.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "38d1ce78-a1e5-4a35-90a2-cfed05b3b5d2",
-                            Name = "Director",
-                            NormalizedName = "DIRECTOR"
-                        },
-                        new
-                        {
-                            Id = "29bbac1f-6218-4fa8-856b-fc1b9296fcc2",
-                            Name = "Cast",
-                            NormalizedName = "CAST"
-                        },
-                        new
-                        {
-                            Id = "0892acc9-93c0-4cc5-9cd9-a6a8417af547",
-                            Name = "Customer",
-                            NormalizedName = "CUSTOMER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -125,80 +105,6 @@ namespace MovieStore.Data.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex")
-                        .HasFilter("[NormalizedUserName] IS NOT NULL");
-
-                    b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasDiscriminator().HasValue("IdentityUser");
-
-                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -297,6 +203,101 @@ namespace MovieStore.Data.Migrations
                     b.ToTable("MovieCustomers", (string)null);
                 });
 
+            modelBuilder.Entity("MovieStore.Entity.BaseUser", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("AccessFailedCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ConcurrencyStamp")
+                        .IsConcurrencyToken()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("LockoutEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("LockoutEnd")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("NormalizedUserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("PhoneNumberConfirmed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("SecurityStamp")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserName")
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NormalizedEmail")
+                        .HasDatabaseName("EmailIndex");
+
+                    b.HasIndex("NormalizedUserName")
+                        .IsUnique()
+                        .HasDatabaseName("UserNameIndex")
+                        .HasFilter("[NormalizedUserName] IS NOT NULL");
+
+                    b.ToTable("AspNetUsers", (string)null);
+                });
+
+            modelBuilder.Entity("MovieStore.Entity.Cast", b =>
+                {
+                    b.Property<string>("BaseUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BaseUserId");
+
+                    b.ToTable("Cast");
+                });
+
+            modelBuilder.Entity("MovieStore.Entity.Customer", b =>
+                {
+                    b.Property<string>("BaseUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BaseUserId");
+
+                    b.ToTable("Customer");
+                });
+
+            modelBuilder.Entity("MovieStore.Entity.Director", b =>
+                {
+                    b.Property<string>("BaseUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("BaseUserId");
+
+                    b.ToTable("Director");
+                });
+
             modelBuilder.Entity("MovieStore.Entity.Kind", b =>
                 {
                     b.Property<int>("Id")
@@ -321,10 +322,11 @@ namespace MovieStore.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CastId")
+                    b.Property<string>("CastBaseUserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("DirectorId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("MovieDate")
@@ -348,7 +350,7 @@ namespace MovieStore.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CastId");
+                    b.HasIndex("CastBaseUserId");
 
                     b.HasIndex("DirectorId");
 
@@ -366,32 +368,11 @@ namespace MovieStore.Data.Migrations
                             }));
                 });
 
-            modelBuilder.Entity("MovieStore.Entity.Cast", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.HasDiscriminator().HasValue("Cast");
-                });
-
-            modelBuilder.Entity("MovieStore.Entity.Customer", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.HasDiscriminator().HasValue("Customer");
-                });
-
-            modelBuilder.Entity("MovieStore.Entity.Director", b =>
-                {
-                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
-
-                    b.HasDiscriminator().HasValue("Director");
-                });
-
             modelBuilder.Entity("CustomerKind", b =>
                 {
                     b.HasOne("MovieStore.Entity.Customer", null)
                         .WithMany()
-                        .HasForeignKey("CustomersId")
+                        .HasForeignKey("CustomersBaseUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -428,7 +409,7 @@ namespace MovieStore.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("MovieStore.Entity.BaseUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -437,7 +418,7 @@ namespace MovieStore.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("MovieStore.Entity.BaseUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -452,7 +433,7 @@ namespace MovieStore.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("MovieStore.Entity.BaseUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -461,7 +442,7 @@ namespace MovieStore.Data.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", null)
+                    b.HasOne("MovieStore.Entity.BaseUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -483,17 +464,64 @@ namespace MovieStore.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MovieStore.Entity.Cast", b =>
+                {
+                    b.HasOne("MovieStore.Entity.BaseUser", "BaseUser")
+                        .WithOne("Cast")
+                        .HasForeignKey("MovieStore.Entity.Cast", "BaseUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BaseUser");
+                });
+
+            modelBuilder.Entity("MovieStore.Entity.Customer", b =>
+                {
+                    b.HasOne("MovieStore.Entity.BaseUser", "BaseUser")
+                        .WithOne("Customer")
+                        .HasForeignKey("MovieStore.Entity.Customer", "BaseUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BaseUser");
+                });
+
+            modelBuilder.Entity("MovieStore.Entity.Director", b =>
+                {
+                    b.HasOne("MovieStore.Entity.BaseUser", "BaseUser")
+                        .WithOne("Director")
+                        .HasForeignKey("MovieStore.Entity.Director", "BaseUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BaseUser");
+                });
+
             modelBuilder.Entity("MovieStore.Entity.Movie", b =>
                 {
                     b.HasOne("MovieStore.Entity.Cast", null)
                         .WithMany("Movies")
-                        .HasForeignKey("CastId");
+                        .HasForeignKey("CastBaseUserId");
 
                     b.HasOne("MovieStore.Entity.Director", "Director")
                         .WithMany("Movies")
-                        .HasForeignKey("DirectorId");
+                        .HasForeignKey("DirectorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Director");
+                });
+
+            modelBuilder.Entity("MovieStore.Entity.BaseUser", b =>
+                {
+                    b.Navigation("Cast")
+                        .IsRequired();
+
+                    b.Navigation("Customer")
+                        .IsRequired();
+
+                    b.Navigation("Director")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MovieStore.Entity.Cast", b =>
