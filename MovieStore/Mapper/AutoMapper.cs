@@ -26,6 +26,10 @@ namespace MovieStore.Mapper
             CreateMap<CreateMovieDto, Movie>().ReverseMap();
 
 
+            CreateMap<CreateKindDto ,Kind>().ReverseMap();
+            CreateMap<UpdateKindDto, Kind>().ReverseMap();
+
+
         }
     }
 }

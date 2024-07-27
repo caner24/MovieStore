@@ -70,10 +70,12 @@ namespace MovieStore.Controllers
 
             foreach (var item in movieId)
             {
-                var movies = await _unitOfWork.MovieDal.Get(x => x.Id == item).FirstOrDefaultAsync();
+                var movies = await _unitOfWork.MovieDal.Get(x => x.Id == item).AsNoTracking().FirstOrDefaultAsync();
                 if (movies == null)
                     return BadRequest("Searched movie was not found.");
-                customer.Movies.Add(movies);
+                customer.Movies.Add(new MovieCustomer { CustomerId = customer.BaseUserId, MovieId = item });
+                _unitOfWork.Context.Attach(customer);
+                await _unitOfWork.Context.SaveChangesAsync();
             }
 
             return Ok();
@@ -103,9 +105,14 @@ namespace MovieStore.Controllers
         {
             var activeCustomer = claims.Claims.Where(x => x.Type == ClaimTypes.Email).FirstOrDefault().Value;
 
-            var boughtMovies = await _unitOfWork.Context.Movie.TemporalAll()
-                .Where(movie => movie.Customers.Any(c => c.BaseUser.Email == activeCustomer))
-                .ToListAsync();
+            var boughtMovies = await (from movie in _unitOfWork.Context.Movie.TemporalAll()
+                                      join movieCustomer in _unitOfWork.Context.MovieCustomer.TemporalAll()
+                                          on movie.Id equals movieCustomer.MovieId
+                                      join customer in _unitOfWork.Context.Customer
+                                          on movieCustomer.CustomerId equals customer.BaseUserId
+                                      where customer.BaseUser.Email == activeCustomer
+                                      select movie)
+                            .ToListAsync();
 
             return Ok(boughtMovies);
         }

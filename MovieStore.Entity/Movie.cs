@@ -12,7 +12,7 @@ namespace MovieStore.Entity
         public Movie()
         {
             Kinds = new HashSet<Kind>();
-            Customers = new HashSet<Customer>();
+            Customers = new HashSet<MovieCustomer>();
         }
         public int Id { get; set; }
         public string? MovieName { get; set; }
@@ -20,7 +20,7 @@ namespace MovieStore.Entity
         public HashSet<Kind> Kinds { get; set; }
         public string DirectorId { get; set; }
         public Director Director { get; set; }
-        public HashSet<Customer> Customers { get; set; }
+        public HashSet<MovieCustomer> Customers { get; set; }
         public double Price { get; set; }
     }
 }

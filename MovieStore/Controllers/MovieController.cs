@@ -28,15 +28,17 @@ namespace MovieStore.Controllers
             return StatusCode(201, addedMovie.Id);
         }
 
-        [HttpDelete("createMovie/{id}")]
-        public async Task<IActionResult> DeleteMovie([FromRoute] int id, [FromBody] CreateMovieDto createMovieDto)
+        [HttpDelete("deleteMovie/{id}")]
+        public async Task<IActionResult> DeleteMovie([FromRoute] int id)
         {
-            var searchedMovie = await _unitOfWork.MovieDal.Get(x => x.Id == id).FirstOrDefaultAsync();
-            if (searchedMovie is null)
+            var movie = await _unitOfWork.MovieDal.Get(x => x.Id == id).FirstOrDefaultAsync();
+            if (movie != null)
                 return NotFound();
-
-            await _unitOfWork.MovieDal.DeleteAsync(searchedMovie);
-            return StatusCode(201);
+            var movieCustomers = _unitOfWork.Context.MovieCustomer.Where(mc => mc.MovieId == id);
+            _unitOfWork.Context.MovieCustomer.RemoveRange(movieCustomers);
+            _unitOfWork.Context.Movie.Remove(movie);
+            await _unitOfWork.Context.SaveChangesAsync();
+            return Ok();
         }
 
     }

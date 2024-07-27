@@ -185,21 +185,6 @@ namespace MovieStore.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MovieCustomer", b =>
-                {
-                    b.Property<string>("CustomerId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
-                    b.HasKey("CustomerId", "MovieId");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("MovieCustomers", (string)null);
-                });
-
             modelBuilder.Entity("MovieStore.Entity.BaseUser", b =>
                 {
                     b.Property<string>("Id")
@@ -365,6 +350,42 @@ namespace MovieStore.Migrations
                             }));
                 });
 
+            modelBuilder.Entity("MovieStore.Entity.MovieCustomer", b =>
+                {
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("MovieId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodEnd");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodStart");
+
+                    b.HasKey("CustomerId", "MovieId");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("MovieCustomer", (string)null);
+
+                    b.ToTable(tb => tb.IsTemporal(ttb =>
+                            {
+                                ttb.UseHistoryTable("MovieCustomerHistory");
+                                ttb
+                                    .HasPeriodStart("PeriodStart")
+                                    .HasColumnName("PeriodStart");
+                                ttb
+                                    .HasPeriodEnd("PeriodEnd")
+                                    .HasColumnName("PeriodEnd");
+                            }));
+                });
+
             modelBuilder.Entity("CustomerKind", b =>
                 {
                     b.HasOne("MovieStore.Entity.Customer", null)
@@ -446,21 +467,6 @@ namespace MovieStore.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MovieCustomer", b =>
-                {
-                    b.HasOne("MovieStore.Entity.Customer", null)
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("MovieStore.Entity.Movie", null)
-                        .WithMany()
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("MovieStore.Entity.Cast", b =>
                 {
                     b.HasOne("MovieStore.Entity.BaseUser", "BaseUser")
@@ -509,6 +515,25 @@ namespace MovieStore.Migrations
                     b.Navigation("Director");
                 });
 
+            modelBuilder.Entity("MovieStore.Entity.MovieCustomer", b =>
+                {
+                    b.HasOne("MovieStore.Entity.Customer", "Customer")
+                        .WithMany("Movies")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("MovieStore.Entity.Movie", "Movie")
+                        .WithMany("Customers")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Movie");
+                });
+
             modelBuilder.Entity("MovieStore.Entity.BaseUser", b =>
                 {
                     b.Navigation("Cast")
@@ -526,9 +551,19 @@ namespace MovieStore.Migrations
                     b.Navigation("Movies");
                 });
 
+            modelBuilder.Entity("MovieStore.Entity.Customer", b =>
+                {
+                    b.Navigation("Movies");
+                });
+
             modelBuilder.Entity("MovieStore.Entity.Director", b =>
                 {
                     b.Navigation("Movies");
+                });
+
+            modelBuilder.Entity("MovieStore.Entity.Movie", b =>
+                {
+                    b.Navigation("Customers");
                 });
 #pragma warning restore 612, 618
         }

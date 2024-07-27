@@ -23,6 +23,7 @@ namespace MovieStore.Data.Concrete
         }
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Cast> Cast { get; set; }
+        public DbSet<MovieCustomer> MovieCustomer { get; set; }
         public DbSet<Director> Director { get; set; }
         public DbSet<Kind> Kind { get; set; }
         public DbSet<Movie> Movie { get; set; }
@@ -30,29 +31,26 @@ namespace MovieStore.Data.Concrete
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Movie>()
-             .ToTable("Movie", t => t.IsTemporal());
+     .ToTable("Movie", t => t.IsTemporal());
+
+            builder.Entity<MovieCustomer>()
+.ToTable("MovieCustomer", t => t.IsTemporal());
+
+            builder.Entity<MovieCustomer>().HasKey(x => new { x.CustomerId, x.MovieId });
+
+            builder.Entity<MovieCustomer>()
+           .HasOne(x => x.Movie)
+           .WithMany(x => x.Customers)
+           .HasForeignKey(x => x.MovieId)
+           .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Entity<MovieCustomer>()
+                .HasOne(x => x.Customer)
+                .WithMany(x => x.Movies)
+                .HasForeignKey(x => x.CustomerId)
+                .OnDelete(DeleteBehavior.NoAction);
 
 
-            builder.Entity<Movie>()
-                .HasMany(m => m.Customers)
-                .WithMany(c => c.Movies)
-                .UsingEntity<Dictionary<string, object>>(
-                    "MovieCustomer",
-                    j => j
-                        .HasOne<Customer>()
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.NoAction),
-                    j => j
-                        .HasOne<Movie>()
-                        .WithMany()
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.NoAction),
-                    j =>
-                    {
-                        j.HasKey("CustomerId", "MovieId");
-                        j.ToTable("MovieCustomers");
-                    });
             builder.Entity<Cast>().HasKey(x => x.BaseUserId);
             builder.Entity<Cast>().HasOne(x => x.BaseUser).WithOne(x => x.Cast).HasForeignKey<Cast>(x => x.BaseUserId);
 
@@ -67,7 +65,7 @@ namespace MovieStore.Data.Concrete
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-
+         
             base.OnConfiguring(optionsBuilder);
         }
 

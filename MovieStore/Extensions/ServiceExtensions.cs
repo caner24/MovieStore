@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MovieStore.Data.Abstract;
 using MovieStore.Data.Concrete;
 using MovieStore.Entity;
+using MovieStore.Entity.Dto;
+using MovieStore.Validation;
 using System.Reflection;
 
 namespace MovieStore.Extensions
@@ -41,6 +44,14 @@ namespace MovieStore.Extensions
             services.AddScoped<IMovieDal, MovieDal>();
             services.AddScoped<IKindDal, KindDal>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            services.AddScoped<IValidator<BaseForDeleteDto>, BaseForDeleteDtoValidator>();
+            services.AddScoped<IValidator<BaseUserForCreationDto>, BaseUserForCreationDtoValidator>();
+            services.AddScoped<IValidator<CreateKindDto>, CreateKindDtoValidator>();
+            services.AddScoped<IValidator<UpdateDirectorDto>, UpdateDirectorDtoValidator>();
+            services.AddScoped<IValidator<UpdateKindDto>, UpdateKindDtoValidator>();
+
+
 
         }
     }
