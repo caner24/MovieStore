@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using MovieStore.ActionFilters;
 
 namespace MovieStore.Controllers
 {
@@ -48,6 +49,8 @@ namespace MovieStore.Controllers
         }
 
         [HttpPost("login")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+
         public async Task<IActionResult> LoginCustomer([FromBody] CreateCustomerDto createCustomerDto)
         {
             var cast = await _unitOfWork.CustomerDal.SignIn(createCustomerDto.Email, createCustomerDto.Password);

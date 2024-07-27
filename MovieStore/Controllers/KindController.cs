@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MovieStore.ActionFilters;
 using MovieStore.Data.Abstract;
 using MovieStore.Entity;
 using MovieStore.Entity.Dto;
@@ -20,13 +21,14 @@ namespace MovieStore.Controllers
         }
 
         [HttpGet("getAllKind")]
-        public async Task<IActionResult> GetAllKind(CreateKindDto createKindDto)
+        public async Task<IActionResult> GetAllKind()
         {
             var kinds = await _unitOfWork.KindDal.GetAll().ToListAsync();
 
             return Ok(kinds);
         }
         [HttpPost("addKind")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> AddKind(CreateKindDto createKindDto)
         {
             var mapped = _mapper.Map<Kind>(createKindDto);
@@ -48,6 +50,8 @@ namespace MovieStore.Controllers
         }
 
         [HttpPut("updateKind")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+
         public async Task<IActionResult> UpdateKind(UpdateKindDto updateKindDto)
         {
             var kind = await _unitOfWork.KindDal.Get(x => x.Id == updateKindDto.Id).FirstOrDefaultAsync();

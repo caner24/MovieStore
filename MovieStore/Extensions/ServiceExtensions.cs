@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using MovieStore.ActionFilters;
 using MovieStore.Data.Abstract;
 using MovieStore.Data.Concrete;
 using MovieStore.Entity;
@@ -50,6 +51,9 @@ namespace MovieStore.Extensions
             services.AddScoped<IValidator<CreateKindDto>, CreateKindDtoValidator>();
             services.AddScoped<IValidator<UpdateDirectorDto>, UpdateDirectorDtoValidator>();
             services.AddScoped<IValidator<UpdateKindDto>, UpdateKindDtoValidator>();
+
+            services.AddScoped<ValidationFilterAttribute>();
+
 
 
 

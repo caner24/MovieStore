@@ -5,6 +5,7 @@ using MovieStore.Entity.Dto;
 using MovieStore.Entity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using MovieStore.ActionFilters;
 
 namespace MovieStore.Controllers
 {
@@ -21,6 +22,7 @@ namespace MovieStore.Controllers
         }
 
         [HttpPost("createCast")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateCast([FromBody] CreateCastDto createCastDto)
         {
             var cast = _mapper.Map<BaseUser>(createCastDto);
@@ -60,6 +62,8 @@ namespace MovieStore.Controllers
         }
 
         [HttpDelete("deleteCast/{Id}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+
         public async Task<IActionResult> DeleteCast([FromRoute] DeleteCastDto deleteCastDto)
         {
             var cast = await _unitOfWork.CastDal.Get(x => x.BaseUser.Email == deleteCastDto.Id).FirstOrDefaultAsync();

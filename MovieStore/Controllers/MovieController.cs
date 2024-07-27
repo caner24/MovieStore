@@ -4,6 +4,7 @@ using MovieStore.Entity;
 using AutoMapper;
 using MovieStore.Data.Abstract;
 using Microsoft.EntityFrameworkCore;
+using MovieStore.ActionFilters;
 
 namespace MovieStore.Controllers
 {
@@ -20,6 +21,8 @@ namespace MovieStore.Controllers
         }
 
         [HttpPost("createMovie")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+
         public async Task<IActionResult> CreateMovie([FromBody] CreateMovieDto createMovieDto)
         {
             var movie = _mapper.Map<Movie>(createMovieDto);

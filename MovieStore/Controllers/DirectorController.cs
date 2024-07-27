@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MovieStore.ActionFilters;
 using MovieStore.Data.Abstract;
 using MovieStore.Entity;
 using MovieStore.Entity.Dto;
@@ -31,6 +32,8 @@ namespace MovieStore.Controllers
         }
 
         [HttpDelete("deleteDirector/{Id}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+
         public async Task<IActionResult> DeleteCast([FromRoute] DeleteDirectorDto deleteDirectorDto)
         {
             var director = await _unitOfWork.DirectorDal.Get(x => x.BaseUser.Email == deleteDirectorDto.Id).FirstOrDefaultAsync();
@@ -42,6 +45,8 @@ namespace MovieStore.Controllers
         }
 
         [HttpPut("updateDirector/{Email}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+
         public async Task<IActionResult> UpdateDirector([FromRoute] UpdateDirectorDto updateDirectorDto)
         {
             var director = await _unitOfWork.DirectorDal.Get(x => x.BaseUser.Email == updateDirectorDto.Email).FirstOrDefaultAsync();
@@ -54,6 +59,8 @@ namespace MovieStore.Controllers
         }
 
         [HttpPost("createDirector")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+
         public async Task<IActionResult> CreateDirector([FromBody] CreateDirectorDto createDirectorDto)
         {
             var director = _mapper.Map<BaseUser>(createDirectorDto);
